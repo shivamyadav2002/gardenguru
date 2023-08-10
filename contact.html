@@ -19,6 +19,7 @@
 		<link rel="stylesheet" href="assets/css/main.css">
     </head>
     <body>
+       
         <!--[if lte IE 9]>
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
         <![endif]-->
@@ -171,8 +172,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <form action="assets/php/mail.php" class="contact-form">
+                            <form  class="contact-form" id="google_form_submit">
                                 <div class="row">
+                                    
+                                    <input type="hidden" name="date" id="date"/>
                                     <div class="col-md-6">
                                         <input type="text" name="name" id="name" placeholder="Name" required>
                                     </div>
@@ -185,7 +188,7 @@
                                         <input type="text" name="phone" id="phone" placeholder="Phone" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <input type="text" name="subject" id="email" placeholder="Subject" required>
+                                        <input type="text" name="subject" id="subject" placeholder="Subject" required>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -196,6 +199,7 @@
                                 <div class="row">
                                     <div class="col-12">
                                         <div class="button text-center">
+                                            <div id="msgs"></div>
                                             <button type="submit" class="theme-btn">Send Message</button>
                                         </div>
                                     </div>
@@ -360,6 +364,8 @@
             </div>
         </div>
     </footer>
+    <!-- The Modal -->
+  
     <!-- ========================= footer end ========================= -->
 
 
@@ -378,5 +384,48 @@
         <script src="assets/js/wow.min.js"></script>
         <script src="assets/js/imagesloaded.min.js"></script>
 		<script src="assets/js/main.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script>
+            
+            var d = new Date();
+
+            document.getElementById("date").value = d.toDateString();
+            // Set the value of the "date" field
+
+            $('#google_form_submit').submit(function(e){
+                e.preventDefault();
+                var formData = $('#google_form_submit').serialize();
+                $.ajax({
+                      type        : 'POST', 
+                      url         : 'https://script.google.com/macros/s/AKfycbyZivhofeKOxUrQEtWV9LWKG9iCcq12olC-u7o_pK6whA5Cfm5WLyFI768XudL9aq-3/exec',
+                      data        : formData, 
+                      dataType    : 'json',
+                      encode      : true
+                 }).done(function(data) {
+                      if(data.result == 'success') {
+                        // Form submission was successful and accepted by google. 
+                        // You can show your success message here
+                        $('#msgs').html("<div class='alert alert-success'><strong>Success!</strong>Thanks for your interest! we will contact you soon.</div>");
+                       
+          
+                      } else {
+                        $('#msgs').html("<div class='alert alert-warning'><strong>Warning!</strong>"+data.result+"</div>");
+                       
+          
+                      }
+                 }).fail(function (jqXHR,status,err) {
+                      // Form submission failed due to some network or other errors
+                      // I am alerting the error but you can do anything else with it     
+                      $('#msgs').html("<div class='alert alert-danger'><strong>Danger!</strong>"+err+"</div>");
+                 });
+            });
+            setTimeout(() => {
+                $('.alert').alert('close');
+            }, 2000);
+        </script>
+        
+            
+         
+       
     </body>
 </html>
